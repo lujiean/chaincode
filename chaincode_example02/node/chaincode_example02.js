@@ -149,7 +149,7 @@ var Chaincode = class {
 
     // Write the states back to the ledger
     try {
-      await stub.putState(A, Buffer.from(Aval));
+      await stub.putState(A, Buffer.from(amount));
       return shim.success();
     } catch (err) {
       return shim.error(err);
@@ -174,7 +174,7 @@ var Chaincode = class {
 
     // Write the states back to the ledger
     try {
-      await stub.putState(A, Buffer.from(Aval));
+      await stub.putState(A, Buffer.from(amount));
       return shim.success();
     } catch (err) {
       return shim.error(err);
@@ -272,6 +272,59 @@ var Chaincode = class {
     console.info('Query Response:');
     console.info(jsonResp);
     return Avalbytes;
+  }
+
+  async passMoney(stub, args) {
+    if (args.length != 3) {
+      throw new Error('Incorrect number of arguments. Expecting 3');
+    }
+
+    let A = args[0];
+    let B = args[1];
+    if (!A || !B) {
+      // throw new Error('asset holding must not be empty');
+      console.info('501 - asset holding must not be empty');
+      return shim.success('501');
+    }
+
+    // Get the state from the ledger
+    let Avalbytes = await stub.getState(A);
+    if (!Avalbytes) {
+      // throw new Error('Failed to get state of asset holder A');
+      console.info('502 - Failed to get state of asset holder A');
+      return shim.success('502');
+    }
+    let Aval = parseInt(Avalbytes.toString());
+
+    let Bvalbytes = await stub.getState(B);
+    if (!Bvalbytes) {
+      // throw new Error('Failed to get state of asset holder B');
+      console.info('503 - Failed to get state of asset holder B');
+      return shim.success('503');
+    }
+
+    let Bval = parseInt(Bvalbytes.toString());
+    // Perform the execution
+    let amount = parseInt(args[2]);
+    if (typeof amount !== 'number') {
+      // throw new Error('Expecting integer value for amount to be transaferred');
+      console.info('504 - Expecting integer value for amount to be transaferred');
+      return shim.success('504');
+    }
+
+    if (Aval - amount < 0) {
+      // not enough money
+      console.info('505 - not enough money');
+      return shim.success('505');
+    }
+
+    Aval = Aval - amount;
+    Bval = Bval + amount;
+    console.info(util.format('Aval = %d, Bval = %d\n', Aval, Bval));
+
+    // Write the states back to the ledger
+    await stub.putState(A, Buffer.from(Aval.toString()));
+    await stub.putState(B, Buffer.from(Bval.toString()));
   }
   //Homework 04102018
 };
