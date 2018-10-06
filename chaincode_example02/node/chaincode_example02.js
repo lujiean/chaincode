@@ -133,6 +133,147 @@ var Chaincode = class {
     console.info(jsonResp);
     return Avalbytes;
   }
+
+  //Homework 04102018
+  async addClient(stub, args) {
+    if (args.length != 2) {
+      throw new Error('Incorrect number of arguments. Expecting 2');
+    }
+
+    //get client id and client amount
+    let A = args[0];
+    let amount = parseInt(args[1]);
+    if (typeof amount !== 'number') {
+      throw new Error('Expecting integer value for amount to be transaferred');
+    }
+
+    // Write the states back to the ledger
+    try {
+      await stub.putState(A, Buffer.from(Aval));
+      return shim.success();
+    } catch (err) {
+      return shim.error(err);
+    }
+  }
+
+  async updateClient(stub, args) {
+    if (args.length != 2) {
+      throw new Error('Incorrect number of arguments. Expecting 2');
+    }
+
+    let A = args[0];
+    let Avalbytes = await stub.getState(A);
+    if (!Avalbytes) {
+      throw new Error('Not found exsiting Client');
+    }
+
+    let amount = parseInt(args[1]);
+    if (typeof amount !== 'number') {
+      throw new Error('Expecting integer value for amount to be transaferred');
+    }
+
+    // Write the states back to the ledger
+    try {
+      await stub.putState(A, Buffer.from(Aval));
+      return shim.success();
+    } catch (err) {
+      return shim.error(err);
+    }
+  }
+
+  async deleteClient(stub, args) {
+    if (args.length != 1) {
+      throw new Error('Incorrect number of arguments. Expecting 1');
+    }
+
+    let A = args[0];
+    let Avalbytes = await stub.getState(A);
+    if (!Avalbytes) {
+      throw new Error('Not found exsiting Client');
+    }
+
+    // Write the states back to the ledger
+    try {
+      await stub.deleteState(A);
+      return shim.success();
+    } catch (err) {
+      return shim.error(err);
+    }
+  }
+
+  async queryAllClient(stub, args) {
+    if (args.length != 0) {
+      throw new Error('Incorrect number of arguments. Expecting 0');
+    }
+
+    // let A = args[0];
+    // let Avalbytes = await stub.getState(A);
+    // if (!Avalbytes) {
+    //   throw new Error('Not found exsiting Client');
+    // }
+
+    // Write the states back to the ledger
+    // try {
+    //   await stub.deleteState(A);
+    //   return shim.success();
+    // } catch (err) {
+    //   return shim.error(err);
+    // }
+
+
+    // let startKey = 'CAR0';
+    // let endKey = 'CAR999';
+
+    let iterator = await stub.getStateByPartialCompositeKey('Client', []);
+
+    let allResults = [];
+    while (true) {
+      let res = await iterator.next();
+
+      if (res.value && res.value.value.toString()) {
+        let jsonRes = {};
+        console.log(res.value.value.toString('utf8'));
+
+        jsonRes.Key = res.value.key;
+        try {
+          jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
+        } catch (err) {
+          console.log(err);
+          jsonRes.Record = res.value.value.toString('utf8');
+        }
+        allResults.push(jsonRes);
+      }
+      if (res.done) {
+        console.log('end of data');
+        await iterator.close();
+        console.info(allResults);
+        return Buffer.from(JSON.stringify(allResults));
+      }
+    }
+  }
+
+  async queryByClient(stub, args) {
+    if (args.length != 1) {
+      throw new Error('Incorrect number of arguments. Expecting name of the person to query')
+    }
+
+    let jsonResp = {};
+    let A = args[0];
+
+    // Get the state from the ledger
+    let Avalbytes = await stub.getState(A);
+    if (!Avalbytes) {
+      jsonResp.error = 'Failed to get state for ' + A;
+      throw new Error(JSON.stringify(jsonResp));
+    }
+
+    jsonResp.name = A;
+    jsonResp.amount = Avalbytes.toString();
+    console.info('Query Response:');
+    console.info(jsonResp);
+    return Avalbytes;
+  }
+  //Homework 04102018
 };
 
 shim.start(new Chaincode());
