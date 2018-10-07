@@ -148,12 +148,12 @@ var Chaincode = class {
     }
 
     // Write the states back to the ledger
-    try {
+    // try {
       await stub.putState(A, Buffer.from(amount));
-      return shim.success();
-    } catch (err) {
-      return shim.error(err);
-    }
+    //   return shim.success();
+    // } catch (err) {
+    //   return shim.error(err);
+    // }
   }
 
   async updateClient(stub, args) {
