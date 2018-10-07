@@ -142,14 +142,14 @@ var Chaincode = class {
 
     //get client id and client amount
     let A = args[0];
-    let amount = parseInt(args[1]);
-    if (typeof amount !== 'number') {
+    let amount = args[1];
+    if (typeof parseInt(amount) !== 'number') {
       throw new Error('Expecting integer value for amount to be transaferred');
     }
 
     // Write the states back to the ledger
     try {
-      await stub.putState(A, Buffer.from(amount.toString()));
+      await stub.putState(A, Buffer.from(amount));
       return shim.success();
     } catch (err) {
       return shim.error(err);
