@@ -190,6 +190,40 @@ func (t *SimpleChaincode) query(stub shim.ChaincodeStubInterface, args []string)
 	fmt.Printf("Query Response:%s\n", jsonResp)
 	return shim.Success(Avalbytes)
 }
+// Homework 04102018
+func (t *SimpleChaincode) addClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	// Add the key from the state in ledger
+	A = args[0]
+	Avalbytes, err := stub.GetState(A)
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	if Avalbytes == nil {
+		jsonResp := "{\"Error\":\"No amount for " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	Aval, err = strconv.Atoi(args[1])
+	if err != nil {
+		return shim.Error("Expecting integer value for asset holding")
+	}
+	fmt.Printf("Aval = %d\n", Aval)
+
+	// Write the state to the ledger
+	err = stub.PutState(A, []byte(strconv.Itoa(Aval)))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+// Homework 04102018
 
 func main() {
 	err := shim.Start(new(SimpleChaincode))
