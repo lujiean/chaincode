@@ -194,7 +194,8 @@ func (t *SimpleChaincode) query(stub shim.ChaincodeStubInterface, args []string)
 func (t *SimpleChaincode) addClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	var A string // Entities
 	var err error
-	
+	var Aval int // Asset holdings
+
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
