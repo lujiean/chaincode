@@ -212,8 +212,8 @@ func (t *SimpleChaincode) addClient(stub shim.ChaincodeStubInterface, args []str
 		return shim.Error(jsonResp)
 	}
 
-	if Avalbytes == nil {
-		jsonResp := "{\"Error\":\"No amount for " + A + "\"}"
+	if Avalbytes != nil {
+		jsonResp := "{\"Error\":\"Already exists " + A + "\"}"
 		return shim.Error(jsonResp)
 	}
 
