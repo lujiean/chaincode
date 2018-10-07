@@ -149,7 +149,7 @@ var Chaincode = class {
 
     // Write the states back to the ledger
     try {
-      await stub.putState(A, Buffer.from(amount));
+      await stub.putState(A, Buffer.from(amount.toString()));
       return shim.success();
     } catch (err) {
       return shim.error(err);
@@ -174,7 +174,7 @@ var Chaincode = class {
 
     // Write the states back to the ledger
     try {
-      await stub.putState(A, Buffer.from(amount));
+      await stub.putState(A, Buffer.from(amount.toString()));
       return shim.success();
     } catch (err) {
       return shim.error(err);
