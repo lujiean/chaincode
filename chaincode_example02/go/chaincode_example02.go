@@ -85,6 +85,10 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		// the old "Query" is now implemtned in invoke
 		return t.query(stub, args)
 	}
+	else if function == "addClient" {
+		// the old "Query" is now implemtned in invoke
+		return t.addClient(stub, args)
+	}
 
 	return shim.Error("Invalid invoke function name. Expecting \"invoke\" \"delete\" \"query\"")
 }
