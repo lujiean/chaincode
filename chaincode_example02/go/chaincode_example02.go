@@ -84,8 +84,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	} else if function == "query" {
 		// the old "Query" is now implemtned in invoke
 		return t.query(stub, args)
-	}
-	else if function == "addClient" {
+	// }
+	} else if function == "addClient" {
 		// the old "Query" is now implemtned in invoke
 		return t.addClient(stub, args)
 	}
