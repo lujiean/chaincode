@@ -23,6 +23,8 @@ package main
 //hard-coding.
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -396,7 +398,7 @@ func (t *SimpleChaincode) tradeClient(stub shim.ChaincodeStubInterface, args []s
 	return shim.Success(nil)
 }
 
-func (t *SimpleChaincode) queryAllClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (t *SimpleChaincode) queryAllClient(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
 	startKey := "a"
 	endKey := "z"
 
