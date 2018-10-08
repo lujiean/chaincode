@@ -274,7 +274,7 @@ func (t *SimpleChaincode) updateClient(stub shim.ChaincodeStubInterface, args []
 func (t *SimpleChaincode) deleteClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	var A string // Entities
 	var err error
-	var Aval int // Asset holdings
+	// var Aval int // Asset holdings
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
@@ -311,7 +311,7 @@ func (t *SimpleChaincode) deleteClient(stub shim.ChaincodeStubInterface, args []
 func (t *SimpleChaincode) queryByClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	var A string // Entities
 	var err error
-	var Aval int // Asset holdings
+	// var Aval int // Asset holdings
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
