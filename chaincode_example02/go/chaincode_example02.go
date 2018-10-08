@@ -24,7 +24,7 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"strconv"
 
@@ -376,7 +376,7 @@ func (t *SimpleChaincode) tradeClient(stub shim.ChaincodeStubInterface, args []s
 	}
 
 	if Aval - X < 0 {
-		jsonResp := "{\"Error\":\"Invalid transaction amount, must < " + Aval + "\"}"
+		jsonResp := "{\"Error\":\"Invalid transaction amount, must < " + string(Aval) + "\"}"
 		return shim.Error(jsonResp)
 	}
 
