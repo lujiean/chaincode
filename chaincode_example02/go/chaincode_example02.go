@@ -374,7 +374,8 @@ func (t *SimpleChaincode) tradeClient(stub shim.ChaincodeStubInterface, args []s
 	}
 
 	if Aval - X < 0 {
-		return shim.Error("Invalid transaction amount, must < %d", Aval)
+		jsonResp := "{\"Error\":\"Invalid transaction amount, must < " + Aval + "\"}"
+		return shim.Error(jsonResp)
 	}
 
 	Aval = Aval - X
