@@ -231,6 +231,211 @@ func (t *SimpleChaincode) addClient(stub shim.ChaincodeStubInterface, args []str
 
 	return shim.Success(nil)
 }
+
+func (t *SimpleChaincode) updateClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	var A string // Entities
+	var err error
+	var Aval int // Asset holdings
+
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	// Add the key from the state in ledger
+	A = args[0]
+	Avalbytes, err := stub.GetState(A)
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	if Avalbytes == nil {
+		jsonResp := "{\"Error\":\"Not exists " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	Aval, err = strconv.Atoi(args[1])
+	if err != nil {
+		return shim.Error("Expecting integer value for asset holding")
+	}
+	fmt.Printf("Aval = %d\n", Aval)
+
+	// Write the state to the ledger
+	err = stub.PutState(A, []byte(strconv.Itoa(Aval)))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (t *SimpleChaincode) deleteClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	var A string // Entities
+	var err error
+	var Aval int // Asset holdings
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	// Add the key from the state in ledger
+	A = args[0]
+	Avalbytes, err := stub.GetState(A)
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	if Avalbytes == nil {
+		jsonResp := "{\"Error\":\"Not exists " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	// Aval, err = strconv.Atoi(args[1])
+	// if err != nil {
+	// 	return shim.Error("Expecting integer value for asset holding")
+	// }
+	// fmt.Printf("Aval = %d\n", Aval)
+
+	// Write the state to the ledger
+	err = stub.DelState(A)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (t *SimpleChaincode) queryByClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	var A string // Entities
+	var err error
+	var Aval int // Asset holdings
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	// Add the key from the state in ledger
+	A = args[0]
+
+	Avalbytes, err := stub.GetState(A)
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	if Avalbytes == nil {
+		jsonResp := "{\"Error\":\"Nil amount for " + A + "\"}"
+		return shim.Error(jsonResp)
+	}
+
+	jsonResp := "{\"Name\":\"" + A + "\",\"Amount\":\"" + string(Avalbytes) + "\"}"
+	fmt.Printf("Query Response:%s\n", jsonResp)
+	return shim.Success(Avalbytes)
+}
+
+func (t *SimpleChaincode) tradeClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	var A, B string    // Entities
+	var Aval, Bval int // Asset holdings
+	var X int          // Transaction value
+	var err error
+
+	if len(args) != 3 {
+		return shim.Error("Incorrect number of arguments. Expecting 3")
+	}
+
+	A = args[0]
+	B = args[1]
+
+	// Get the state from the ledger
+	// TODO: will be nice to have a GetAllState call to ledger
+	Avalbytes, err := stub.GetState(A)
+	if err != nil {
+		return shim.Error("Failed to get state")
+	}
+	if Avalbytes == nil {
+		return shim.Error("Entity not found")
+	}
+	Aval, _ = strconv.Atoi(string(Avalbytes))
+
+	Bvalbytes, err := stub.GetState(B)
+	if err != nil {
+		return shim.Error("Failed to get state")
+	}
+	if Bvalbytes == nil {
+		return shim.Error("Entity not found")
+	}
+	Bval, _ = strconv.Atoi(string(Bvalbytes))
+
+	// Perform the execution
+	X, err = strconv.Atoi(args[2])
+	if err != nil {
+		return shim.Error("Invalid transaction amount, expecting a integer value")
+	}
+
+	if Aval - X < 0 {
+		return shim.Error("Invalid transaction amount, must < %d", Aval)
+	}
+
+	Aval = Aval - X
+	Bval = Bval + X
+	fmt.Printf("Aval = %d, Bval = %d\n", Aval, Bval)
+
+	// Write the state back to the ledger
+	err = stub.PutState(A, []byte(strconv.Itoa(Aval)))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.PutState(B, []byte(strconv.Itoa(Bval)))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (t *SimpleChaincode) queryAllClient(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	startKey := "a"
+	endKey := "z"
+
+	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	defer resultsIterator.Close()
+
+	// buffer is a JSON array containing QueryResults
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
+
+	bArrayMemberAlreadyWritten := false
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		// Add a comma before array members, suppress it for the first array member
+		if bArrayMemberAlreadyWritten == true {
+			buffer.WriteString(",")
+		}
+		buffer.WriteString("{\"Key\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(queryResponse.Key)
+		buffer.WriteString("\"")
+
+		buffer.WriteString(", \"Record\":")
+		// Record is a JSON object, so we write as-is
+		buffer.WriteString(string(queryResponse.Value))
+		buffer.WriteString("}")
+		bArrayMemberAlreadyWritten = true
+	}
+	buffer.WriteString("]")
+
+	fmt.Printf("- queryAllClient:\n%s\n", buffer.String())
+
+	return shim.Success(buffer.Bytes())
+}
 // Homework 04102018
 
 func main() {
