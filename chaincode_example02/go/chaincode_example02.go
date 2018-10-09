@@ -90,8 +90,23 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	} else if function == "addClient" {
 		// the old "Query" is now implemtned in invoke
 		return t.addClient(stub, args)
+	} else if function == "updateClient" {
+		// the old "Query" is now implemtned in invoke
+		return t.updateClient(stub, args)
+	} else if function == "deleteClient" {
+		// the old "Query" is now implemtned in invoke
+		return t.deleteClient(stub, args)
+	} else if function == "queryByClient" {
+		// the old "Query" is now implemtned in invoke
+		return t.queryByClient(stub, args)
+	} else if function == "tradeClient" {
+		// the old "Query" is now implemtned in invoke
+		return t.tradeClient(stub, args)
+	} else if function == "queryAllClient" {
+		// the old "Query" is now implemtned in invoke
+		return t.queryAllClient(stub, args)
 	}
-
+	
 	return shim.Error("Invalid invoke function name. Expecting \"invoke\" \"delete\" \"query\"")
 }
 
