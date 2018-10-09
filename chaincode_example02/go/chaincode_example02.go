@@ -106,7 +106,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		// the old "Query" is now implemtned in invoke
 		return t.queryAllClient(stub, args)
 	}
-	
+
 	return shim.Error("Invalid invoke function name. Expecting \"invoke\" \"delete\" \"query\"")
 }
 
@@ -391,7 +391,7 @@ func (t *SimpleChaincode) tradeClient(stub shim.ChaincodeStubInterface, args []s
 	}
 
 	if Aval - X < 0 {
-		jsonResp := "{\"Error\":\"Invalid transaction amount, must < " + string(Aval) + "\"}"
+		jsonResp := "{\"Error\":\"Invalid transaction amount, must < " + Aval + "\"}"
 		return shim.Error(jsonResp)
 	}
 
